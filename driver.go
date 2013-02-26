@@ -17,6 +17,8 @@ import (
 
 type mysqlDriver struct{}
 
+var connCount int
+
 // Open new Connection.
 // See https://github.com/Go-SQL-Driver/MySQL#dsn-data-source-name for how
 // the DSN string is formated
@@ -25,6 +27,8 @@ func (d *mysqlDriver) Open(dsn string) (driver.Conn, error) {
 
 	// New mysqlConn
 	mc := new(mysqlConn)
+	mc.id = connCount
+	connCount++
 	mc.cfg = parseDSN(dsn)
 
 	// Connect to Server
@@ -62,5 +66,6 @@ func (d *mysqlDriver) Open(dsn string) (driver.Conn, error) {
 }
 
 func init() {
+	connCount = 0
 	sql.Register("mysql", &mysqlDriver{})
 }

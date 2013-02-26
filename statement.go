@@ -12,6 +12,7 @@ package mysql
 import (
 	"database/sql/driver"
 	"errors"
+	"fmt"
 )
 
 type mysqlStmt struct {
@@ -23,6 +24,7 @@ type mysqlStmt struct {
 
 func (stmt *mysqlStmt) Close() (err error) {
 	err = stmt.mc.writeCommandPacket(COM_STMT_CLOSE, stmt.id)
+	fmt.Println("Close", "StmtID:", stmt.id, "ConnID:", stmt.mc.id)
 	stmt.mc = nil
 	return
 }
@@ -35,6 +37,9 @@ func (stmt *mysqlStmt) Exec(args []driver.Value) (driver.Result, error) {
 	if stmt.mc == nil {
 		return nil, errors.New(`Invalid Statement`)
 	}
+
+	fmt.Println("Exec", "StmtID:", stmt.id, "ConnID:", stmt.mc.id)
+
 	stmt.mc.affectedRows = 0
 	stmt.mc.insertId = 0
 
@@ -78,6 +83,8 @@ func (stmt *mysqlStmt) Query(args []driver.Value) (driver.Rows, error) {
 	if stmt.mc == nil {
 		return nil, errors.New(`Invalid Statement`)
 	}
+
+	fmt.Println("Query", "StmtID:", stmt.id, "ConnID:", stmt.mc.id)
 
 	// Send command
 	err := stmt.buildExecutePacket(&args)

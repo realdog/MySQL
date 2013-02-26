@@ -13,6 +13,7 @@ import (
 	"bufio"
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"net"
 	"strings"
 )
@@ -26,6 +27,7 @@ type mysqlConn struct {
 	sequence     uint8
 	affectedRows uint64
 	insertId     uint64
+	id           int
 }
 
 type config struct {
@@ -132,6 +134,8 @@ func (mc *mysqlConn) Prepare(query string) (driver.Stmt, error) {
 			return nil, err
 		}
 	}
+
+	fmt.Println("Prepare", "StmtID:", stmt.id, "ConnID:", stmt.mc.id)
 
 	return stmt, err
 }
